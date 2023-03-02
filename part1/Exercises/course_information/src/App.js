@@ -1,10 +1,10 @@
-const Header = props => {
+const Header = (props) => {
   return (
     <h1>{props.course}</h1>
   );
 }
 
-const Part = props => {
+const Part = (props) => {
   return (
     <p>{props.part} {props.exercises}</p>
   );
@@ -24,7 +24,7 @@ const Content = (props) => {
   );
 }
 
-const Total = props => {
+const Total = (props) => {
   let total = null;
   props.parts.map(part => total += part.exercises)
   return (
