@@ -1,12 +1,48 @@
 import { useState } from 'react';
 
-const randomAnecdote = (length) => Math.floor(Math.random() * length);
+const randomAnecdote = (len) => Math.floor(Math.random() * len);
 
 const updateValues = (object, current) => {
   const update = {...object};
   update[current] += 1;
 
   return update;
+}
+
+const Header = (props) => (<h1>{props.text}</h1>);
+
+const Content = ({anecdotes, points, selected}) => {
+  return (
+    <div>
+      {anecdotes[selected]} <br></br>
+      has {points[selected]} votes <br></br>
+    </div>
+  )
+}
+
+const BestAnecdote = ({object, list}) => {
+  const max = Math.max(...Object.values(object));
+  if (max === 0) {
+    return (
+      <div>
+        no votes yet
+      </div>
+    )
+  }
+
+  let index = 0;
+  for (const key in object) {
+    if (object[key] === max) {
+      index = key;
+    }
+  }
+
+  return (
+    <div>
+      {list[index]} <br></br>
+      has {max} votes
+    </div>
+  )
 }
 
 const App = () => {
@@ -24,14 +60,15 @@ const App = () => {
   const [selected, setSelected] = useState(0);
   const [points, setPoints] = useState(Object.fromEntries(anecdotes.map((anecdote, index) => [index, 0])));
 
-  console.log(points);
-
   return (
     <div>
-      {anecdotes[selected]} <br></br>
-      has {points[selected]} votes <br></br>
+      <Header text = {"Anecdote of the day"}/>
+      <Content anecdotes = {anecdotes} points = {points} selected = {selected}/>
       <button onClick={() => setPoints(updateValues(points, selected))}>vote</button>
       <button onClick={() => setSelected(randomAnecdote(anecdotes.length))}>next anecdote</button>
+
+      <Header text = {"Anecdote with most votes"}/>
+      <BestAnecdote object = {points} list = {anecdotes}/>
     </div>
   )
 }
