@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import database from './services/post-request';
-import axios from 'axios';
 
 const SearchResults = ({ persons, search }) => {
   const searchToLowerCase = search.toLocaleLowerCase();
@@ -9,11 +8,10 @@ const SearchResults = ({ persons, search }) => {
 
   return (
     <>
-    {results.map(person => {
-      console.log(person.name, person.id);
-      return <div key={ person.id }>{ person.name } { person.number }</div>
+    { results.map(person => 
+      <div key={ person.id }>{ person.name } { person.number }</div>
+      ) 
     }
-    )}
     </>
   );
 }
@@ -95,13 +93,8 @@ const App = () => {
 
   useEffect(() => {
   
-    const eventHandler = response => {
-      console.log(response.data);
-      setPersons(response.data);
-    }
-  
-    const promise = axios.get('http://172.22.136.241:3001/persons')
-    promise.then(eventHandler)
+    database.getAll()
+    .then(response => setPersons(response))
   }, [])
 
   return (
