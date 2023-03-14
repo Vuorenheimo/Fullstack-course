@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
 import database from './services/post-request';
 
-const SearchResults = ({ persons, search }) => {
+const SearchResults = ({ persons, search, handleClick }) => {
   const searchToLowerCase = search.toLocaleLowerCase();
   const results = persons.filter(person => 
     person.name.toLocaleLowerCase().includes(searchToLowerCase));
 
   return (
     <>
-    { results.map(person => 
-      <div key={ person.id }>{ person.name } { person.number }</div>
-      ) 
-    }
+
+      { results.map(person => 
+        <div key={ person.id }>
+          { person.name } { person.number } 
+          <button onClick={ () => handleClick(person.id) }>
+            delete</button>
+        </div>
+        ) 
+      }
+
     </>
   );
 }
@@ -79,6 +85,16 @@ const App = () => {
     }
   }
 
+  const deleteName = (id) => {
+    const person = persons.filter(person => person.id === id);
+    const updatePersons = persons.filter(person => person.id !== id);
+
+    if(window.confirm(`Delete ${person[0].name}`)) {
+      setPersons(updatePersons);
+      database.remove(id);
+    }
+  }
+
   const handleNameChange = (event) => {
     setNewName(event.target.value);
   }
@@ -92,7 +108,6 @@ const App = () => {
   }
 
   useEffect(() => {
-  
     database.getAll()
     .then(response => setPersons(response))
   }, [])
@@ -111,7 +126,7 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <SearchResults persons={ persons } search={ search }/>
+      <SearchResults persons={ persons } search={ search } handleClick={ deleteName }/>
     </div>
   )
 }
