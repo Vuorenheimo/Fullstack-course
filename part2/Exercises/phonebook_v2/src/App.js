@@ -8,16 +8,15 @@ const SearchResults = ({ persons, search, handleClick }) => {
 
   return (
     <>
-
       { results.map(person => 
         <div key={ person.id }>
           { person.name } { person.number } 
           <button onClick={ () => handleClick(person.id) }>
-            delete</button>
+            delete
+          </button>
         </div>
         ) 
       }
-
     </>
   );
 }
@@ -65,11 +64,10 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault();
-    const names = persons.map(person => person.name);
+    const newPerson = { name: newName, number: newNumber };
+    const isFound = persons.find(person => person.name === newName)
 
-    if (!names.includes(newName)) {
-      const newPerson = { name: newName, number: newNumber }
-
+    if (!isFound) {
       database.create(newPerson)
       .then(response => {
         setPersons(persons.concat(response));
@@ -81,17 +79,32 @@ const App = () => {
       });
       
     } else {
-      alert(`${ newName } is already added to phonebook`);
+      const person = persons.find(person => person.name === newName);
+
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        
+        database.update(person.id, newPerson)
+        .then(() => {
+          database.getAll()
+          .then(response => {
+            setPersons(response);
+            setNewName('');
+            setNewNumber('');
+          })
+        })
+      }
     }
   }
 
   const deleteName = (id) => {
-    const person = persons.filter(person => person.id === id);
-    const updatePersons = persons.filter(person => person.id !== id);
+    const person = persons.find(person => person.id === id)
 
-    if(window.confirm(`Delete ${person[0].name}`)) {
-      setPersons(updatePersons);
-      database.remove(id);
+    if(window.confirm(`Delete ${person.name}`)) {
+      database.remove(id)
+      .then(database.getAll()
+        .then(response => {
+          setPersons(response.filter(person => person.id !== id));
+        }));
     }
   }
 
